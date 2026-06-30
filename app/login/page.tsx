@@ -23,13 +23,15 @@ export default function LoginPage() {
         if (!username.trim()) { setError('Username is required'); setLoading(false); return }
         const { data, error: signUpErr } = await supabase.auth.signUp({ email, password })
         if (signUpErr) throw signUpErr
-        if (data.user) {
-          await supabase.from('profiles').insert({ id: data.user.id, username: username.trim() })
-          // email confirmation is off — log them straight in
+        const userId = data.user?.id ?? data.session?.user?.id
+        if (userId) {
+          await supabase.from('profiles').insert({ id: userId, username: username.trim() })
+        }
+        if (data.session) {
+          // logged in immediately — no email confirmation required
           router.push('/')
           router.refresh()
         } else {
-          // confirmation email was sent (confirmation is on in Supabase)
           setConfirm(true)
         }
       } else {
