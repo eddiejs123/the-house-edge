@@ -25,8 +25,13 @@ export default function LoginPage() {
         if (signUpErr) throw signUpErr
         if (data.user) {
           await supabase.from('profiles').insert({ id: data.user.id, username: username.trim() })
+          // email confirmation is off — log them straight in
+          router.push('/')
+          router.refresh()
+        } else {
+          // confirmation email was sent (confirmation is on in Supabase)
+          setConfirm(true)
         }
-        setConfirm(true)
       } else {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password })
         if (signInErr) throw signInErr
