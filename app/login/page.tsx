@@ -27,13 +27,9 @@ export default function LoginPage() {
         if (userId) {
           await supabase.from('profiles').insert({ id: userId, username: username.trim() })
         }
-        if (data.session) {
-          // logged in immediately — no email confirmation required
-          router.push('/')
-          router.refresh()
-        } else {
-          setConfirm(true)
-        }
+        // Always redirect — email confirmation is disabled in Supabase
+        router.push('/')
+        router.refresh()
       } else {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password })
         if (signInErr) throw signInErr
